@@ -36,20 +36,34 @@ public class Circuit implements DBInterface {
 	}
 
 	public void printAll(JspWriter out) {
-		for (Component c : compList) {
-			try {
-				out.println("name: " + c.getName());
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+		JSONArray jsa = new JSONArray();
+		try {
+			for (Component c : compList) {
+				JSONObject jso1 = new JSONObject();
+				jso1.put("type", 1);
+				jso1.put("impedence", c.getImpedence());
+				jso1.put("name", c.getName());
+				jsa.put(jso1);
 			}
+			JSONObject jso = new JSONObject();
+			jso.put("status", true);
+			jso.put("components", jsa);
+			out.print(jso.toString());
+			// out.println("name: " + c.getName());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
+
 	public void printAll(PrintStream out) {
+		// JSONObject jso = new JSONObject();
 		for (Component c : compList) {
-				out.println("name: " + c.getName());
+			out.println("name: " + c.getName());
 		}
+
 	}
+
 	public int getComponentsCount() {
 		return compList.size();
 	}
@@ -83,20 +97,25 @@ public class Circuit implements DBInterface {
 			stmt = conn.createStatement();
 			String sql;
 			int type = 0;
-			for(Component c: compList) {
-				sql = "select name from component where name='"+c.getName()+"'";
+			for (Component c : compList) {
+				sql = "select name from component where name='" + c.getName()
+						+ "'";
 				ResultSet rs = stmt.executeQuery(sql);
-				if(rs.next()) continue;
-				if(c instanceof Resistance)
+				if (rs.next())
+					continue;
+				if (c instanceof Resistance)
 					type = 1;
-				else type = 0;
-				sql = "insert into component (name, type) values('"+c.getName()+"', '"+type+"')";
+				else
+					type = 0;
+				sql = "insert into component (name, type) values('"
+						+ c.getName() + "', '" + type + "')";
 				stmt.executeUpdate(sql);
 				ResultSet keys = stmt.getGeneratedKeys();
-				keys.next(); 
+				keys.next();
 				int id = keys.getInt(1);
-				if(type == 1) {
-					sql = "insert into resistance (id, impedence) values('"+id+"', '"+c.getImpedence()+"')";
+				if (type == 1) {
+					sql = "insert into resistance (id, impedence) values('"
+							+ id + "', '" + c.getImpedence() + "')";
 					stmt.executeUpdate(sql);
 				}
 			}
@@ -115,16 +134,17 @@ public class Circuit implements DBInterface {
 			String sql;
 			sql = "SELECT component.id as cid, type, name, impedence FROM component left join resistance on component.id=resistance.id";
 			java.sql.ResultSet rs = stmt.executeQuery(sql);
-			while(rs.next()) {
+			while (rs.next()) {
 				Component c = null;
-				switch(rs.getInt("type")) {
+				switch (rs.getInt("type")) {
 				case 1:
-					c = new Resistance(rs.getString("name"), rs.getInt("impedence"));
+					c = new Resistance(rs.getString("name"),
+							rs.getInt("impedence"));
 					break;
 				default:
 					break;
 				}
-				if(c != null) {
+				if (c != null) {
 					compList.add(c);
 				}
 			}
