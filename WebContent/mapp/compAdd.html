@@ -82,8 +82,6 @@
 					contentType : "application/json",
 					dataType: "json",
 					success : cb
-//						this.updatePage();
-				//}
 				});
 			};
 			
@@ -102,37 +100,42 @@
 				}
 			};
 		}
-		$()
-				.ready(
-						function() {
-							$("input[name='add']")
-									.click(
-											function() {
-												//alert('testing..');
-												component = new Component();
-												component.readFromPage();
-												component.addRemote(function(data){
-													console.log(data);
-													$("#status").html("<b>"+data.status+"</b>");
-												})
-											});
-
-							$("input[name='list']")
-									.click(
-											function() {
-												components = new ComponentList();
-												components.readFromRemote(function(data){
-													if(data.status) {
-													components.components = data.components;
-													console.log(components);
-													components.updatePage();
-													$("#status").html("<b>"+data.status+","+event.timeStamp+"</b>");
-													} else {
-														
-													}
-												} );
-											})
-						})
+		$().ready(function() {
+			$("input[name='add']").click( function() {
+				//alert('testing..');
+				component = new Component();
+				component.readFromPage();
+				component.addRemote(function(data){
+					console.log(data);
+					$("#status").html("<b>"+data.status+"</b>");
+					components = new ComponentList();
+					components.readFromRemote(function(data){
+						if(data.status) {
+						components.components = data.components;
+						console.log(components);
+						components.updatePage();
+						$("#status").html("<b>"+data.status+","+event.timeStamp+"</b>");
+						} else {
+							
+						}
+					});
+				})
+			});
+	
+			$("input[name='list']").click(function() {
+					components = new ComponentList();
+					components.readFromRemote(function(data){
+						if(data.status) {
+						components.components = data.components;
+						console.log(components);
+						components.updatePage();
+						$("#status").html("<b>"+data.status+","+event.timeStamp+"</b>");
+						} else {
+							
+						}
+					} );
+				});
+			})
 	</script>
 </body>
 </html>

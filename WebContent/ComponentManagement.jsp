@@ -12,6 +12,7 @@
 	CircuitDatabase cktDb = new CircuitDatabase();%>
 
 <%
+	cktDb.open();
 	Circuit ckt = new Circuit();
 	cktDb.readObject(ckt);
 	if (ckt.getComponentsCount() == 0) {
@@ -44,7 +45,6 @@
 				//				response.addCookie(cookie);
 			}
 			response.sendRedirect("ComponentManagement.jsp");
-
 		}
 	} else {
 		//we come here because we have get parameter action..
@@ -86,17 +86,20 @@
 					JSONObject jso = new JSONObject();
 					jso.put("status", true);
 					pw.print(jso.toString());
+					cktDb.close();
 					return;
 				}
 			} else if(request.getParameter("action").equals("list")) {
 				ckt.printAll(out);
-				
+				cktDb.close();
+
 				return;
 			}
 			
 		}
-
+	
 	}
+	cktDb.close();
 %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
